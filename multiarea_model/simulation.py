@@ -300,9 +300,15 @@ class Simulation:
 
         self.save_network_gids()
 
-        nest.Simulate(self.T)
+        nest.Simulate(10.0)
         t4 = time.time()
-        self.time_simulate = t4 - t3
+        self.time_presimulate = t4 - t3
+        self.total_memory = self.memory()
+        print("Presimulated network in {0:.2f} seconds.".format(self.time_presimulate))
+
+        nest.Simulate(self.T)
+        t5 = time.time()
+        self.time_simulate = t5 - t4
         self.total_memory = self.memory()
         print("Simulated network in {0:.2f} seconds.".format(self.time_simulate))
         self.logging()
@@ -326,6 +332,7 @@ class Simulation:
             d = {'time_prepare': self.time_prepare,
                  'time_network_local': self.time_network_local,
                  'time_network_global': self.time_network_global,
+                 'time_presimulate': self.time_presimulate,
                  'time_simulate': self.time_simulate,
                  'base_memory': self.base_memory,
                  'network_memory': self.network_memory,
