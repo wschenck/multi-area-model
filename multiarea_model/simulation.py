@@ -91,7 +91,8 @@ class Simulation:
 
         self.areas_simulated = self.params['areas_simulated']
         self.areas_recorded = self.params['recording_dict']['areas_recorded']
-        self.T = self.params['t_sim']
+        self.pre_T = self.params['t_sim']
+        self.T = self.params['t_presim']
 
     def __eq__(self, other):
         # Two simulations are equal if the simulation parameters and
@@ -300,7 +301,7 @@ class Simulation:
 
         self.save_network_gids()
 
-        nest.Simulate(10.0)
+        nest.Simulate(self.t_presim)
         t4 = time.time()
         self.time_presimulate = t4 - t3
         self.total_memory = self.memory()
