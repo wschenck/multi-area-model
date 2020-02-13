@@ -14,7 +14,12 @@ network_params['connection_params']['K_stable'] = os.path.join(
     base_path, 'figures/SchueckerSchmidt2017/K_prime_original.npy'
 )
 
-sim_params.update({'t_sim': 10000.})
+sim_params.update(
+        {
+            't_sim': 10000.
+            't_presim': 10.
+            }
+        )
 theory_params = {'dt': 0.1}
 
 total_num_vp_per_node = 24
