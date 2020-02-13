@@ -20,12 +20,8 @@ jobscript_template = """#!/bin/bash -x
 #SBATCH --account jinb33
 
 module purge
-module use /usr/local/software/jureca/OtherStages
-module load Stages/2018b
 module load GCC CMake ParaStationMPI Python SciPy-Stack GSL
-# source /p/project/cjinb33/jinb3330/gitordner/nest-simulator/7f0ccca/bin/nest_vars.sh # NEST 2.18 with timer
-# source /p/project/cjinb33/jinb3330/gitordner/nest-simulator/d7aa792/bin/nest_vars.sh # NEST 2.14 with timer
-source /p/project/cjinb33/jinb3330/gitordner/nest-simulator/f10cd16/bin/nest_vars.sh # NEST 2.14 with timer
+source {nest_dir}
 
 export KMP_AFFINITY=scatter,verbose
 export LD_PRELOAD=/p/project/cjinb33/jinb3330/jemalloc/lib/libjemalloc.so

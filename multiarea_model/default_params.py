@@ -53,7 +53,9 @@ sim_params = {
     # Default number of nodes
     'num_nodes': 1,
     # Default number of threads per core
-    'num_physical_cores_per_task': 1
+    'num_physical_cores_per_task': 1,
+    # Default directory of NEST
+    'nest_dir': ''
 }
 
 """
