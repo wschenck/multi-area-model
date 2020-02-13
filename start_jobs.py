@@ -65,6 +65,7 @@ def start_job(label, submit_cmd, jobscript_template, sumatra=False, reason=None,
          'local_num_threads': sim_params['local_num_threads'],
          'num_processes': sim_params['num_processes'],
          'num_vp': num_vp,
+         'nest_dir': sim_params['nest_dir'],
          'num_nodes': sim_params['num_nodes'],
          'num_physical_cores_per_task': sim_params['num_physical_cores_per_task']}
 
