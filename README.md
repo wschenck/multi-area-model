@@ -10,6 +10,12 @@
             * Optionally: load jemalloc `ml jemalloc`
         * set thread affinity:
             * export KMP_AFFINITY=scatter,verbose
+                * experimentally tested: performs best with NEST
+        * process bindings
+            * bind the MPI processes in a specific way, eg on sockets on NUMA nodes
+            * As we use 6 mpi processes we cannot to bind to sockets (there are only two)
+            * We use the default on JURECA: --cpu_bind=cores in combination with --distribution=block:cyclic
+                * The default allocation method will fill up one node after another, while filling socket one and two in alternation. Resulting in only even ranks on the first socket of each node and odd on each second socket of each node.
         * contains wild cards of job parameters that will be changed when running the model
     * submit\_cmd: in case of slurm it is sbatch
 * run\_scaling.py
