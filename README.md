@@ -7,6 +7,9 @@
     * jobscript\_template: Skeleton of the jobscript that will be submitted
         * specify mail address
         * specify path to jemalloc, or remove it
+            * Optionally: load jemalloc `ml jemalloc`
+        * set thread affinity:
+            * export KMP_AFFINITY=scatter,verbose
         * contains wild cards of job parameters that will be changed when running the model
     * submit\_cmd: in case of slurm it is sbatch
 * run\_scaling.py
