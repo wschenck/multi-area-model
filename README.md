@@ -51,8 +51,6 @@ git_hash=$(git rev-parse --short=7 HEAD)
 mkdir -p $PWD/build
 cd $PWD/build
 module purge
-module use /usr/local/software/jureca/OtherStages
-module load Stages/2018b
 module load GCC CMake ParaStationMPI Python SciPy-Stack GSL
 cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../$git_hash -DTIMER=1 -Dwith-python=3 -Dwith-ltdl=OFF -Dwith-mpi=ON -DCMAKE_CXX_COMPILER=mpic++ -DCMAKE_C_COMPILER=mpicc ../ && make -j24 && make install
 ```
