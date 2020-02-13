@@ -1,3 +1,74 @@
+# How to run scalings
+
+## Preparations of simulation
+* Create config.py, copy from config\_jarsi.py, contains
+    * base\_path: path to this multi-area model repo
+    * data\_path: Path to the folder where simulation output should be stored. Somewhere in $SCRATCH should be preferred
+    * jobscript\_template: Skeleton of the jobscript that will be submitted
+        * specify mail address
+        * specify path to jemalloc, or remove it
+        * contains wild cards of job parameters that will be changed when running the model
+    * submit\_cmd: in case of slurm it is sbatch
+* run\_scaling.py
+    * Contains all parameters that we are interested in and submits the job
+    * Loads parameters of figure 5 from schmidt2018\_dyn
+        * These are the relevant multi-area model parameters we are interested in
+    * total\_num\_vp\_per\_node
+        * How many virtual processes per node.
+        * 24 because on JURECA we have 24 cores
+        * Hyperthreading has not been advantegous, thus we don't do it
+    * t\_presim:
+        * presimulation phase, important for simulations using the 5g Kernel because during the first timestep connection information is exchanged and we are not interested in this part. If we simulate for a small amount of time we can extract this time
+    * t\_sim:
+        * simulation time of the networt
+        * I chose 10 seconds because it is long enough to have transients and to let the network evolve
+    * mpi\_proc\_per\_node:
+        * how many mpi processes we want to put on a node
+        * 6 mpi processes and 4 threads has yielded the best results ( note: 6 mpi proc * 4 threads each = 24 nvp)
+    * num\_nodes
+        * how many nodes do we want to use
+        * either provide a range or an array
+        * nodes * total_num_vp_per_node gives total number of virtual processes
+    * master\_seed
+        * depending on the seed the network might operate in different regimes
+        * provide different seeds in order to get a mean performance
+        * seeds used during cetrarp scalings: 0, 17, 666
+    * nest\_dir
+        * path to nest installation
+
+## NEST Versions
+* 2.14 with manually inserted timers
+    * https://github.com/jarsi/nest-simulator/tree/2.14\_timer
+* 2.18 with manually inserted timers
+    * https://github.com/jarsi/nest-simulator/tree/2.18\_timer
+* Any other 5g based Kernel:
+    * cherry pick the following commits from the 2.18\_timer branch:
+        * 6a2f6c0e88fb423ae7a4f53f31cd289cce6421cd
+        * 7f0ccca8d4e831bf0dc77debafeea8c3db93806f
+* building NEST with timers
+```
+git_hash=$(git rev-parse --short=7 HEAD)
+mkdir -p $PWD/build
+cd $PWD/build
+module purge
+module use /usr/local/software/jureca/OtherStages
+module load Stages/2018b
+module load GCC CMake ParaStationMPI Python SciPy-Stack GSL
+cmake -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../$git_hash -DTIMER=1 -Dwith-python=3 -Dwith-ltdl=OFF -Dwith-mpi=ON -DCMAKE_CXX_COMPILER=mpic++ -DCMAKE_C_COMPILER=mpicc ../ && make -j24 && make install
+```
+
+## Actual simulation
+* source the relevant modules and nest inside your environment / shell session
+```
+module load GCC CMake ParaStationMPI Python SciPy-Stack GSL
+source /path/to/installation/bin/nest_vars.sh
+```
+* run the model
+```
+python run_scaling.py
+```
+
+
 # Multi-scale spiking network model of macaque visual cortex
 [![www.python.org](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org) <a href="http://www.nest-simulator.org"> <img src="https://raw.githubusercontent.com/nest/nest-simulator/master/extras/logos/nest-simulated.png" alt="NEST simulated" width="50"/></a> [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
