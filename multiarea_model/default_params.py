@@ -48,6 +48,10 @@ sim_params = {
     'local_num_threads': 1,
     # Areas represented in the network
     'areas_simulated': complete_area_list,
+    # Default number of nodes
+    'num_nodes': 1,
+    # Default number of threads per core
+    'num_physical_cores_per_task': 1
 }
 
 """

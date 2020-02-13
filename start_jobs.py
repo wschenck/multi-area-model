@@ -64,7 +64,10 @@ def start_job(label, submit_cmd, jobscript_template, sumatra=False, reason=None,
          'sim_dir': os.path.join(data_path, label),
          'local_num_threads': sim_params['local_num_threads'],
          'num_processes': sim_params['num_processes'],
-         'num_vp': num_vp}
+         'num_vp': num_vp,
+         'num_nodes': sim_params['num_nodes'],
+         'num_physical_cores_per_task': sim_params['num_physical_cores_per_task']}
+
 
     # Write job script
     job_script_fn = os.path.join(data_path,
