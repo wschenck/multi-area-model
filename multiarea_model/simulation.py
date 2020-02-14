@@ -170,12 +170,12 @@ class Simulation:
         - spike detector
         - voltmeter
         """
-        self.spike_detector = nest.Create('spike_detector', 1)
+        self.spike_detector = nest.Create('spike_detector')
         status_dict = deepcopy(self.params['recording_dict']['spike_dict'])
         label = '-'.join((self.label,
                           status_dict['label']))
         status_dict.update({'label': label})
-        nest.SetStatus(self.spike_detector, status_dict)
+        self.spike_detector.set(status_dict)
 
         if self.params['recording_dict']['record_vm']:
             self.voltmeter = nest.Create('voltmeter')
@@ -183,7 +183,7 @@ class Simulation:
             label = '-'.join((self.label,
                               status_dict['label']))
             status_dict.update({'label': label})
-            nest.SetStatus(self.voltmeter, status_dict)
+            self.voltmeter.set(status_dict)
 
     def create_areas(self):
         """
@@ -441,33 +441,17 @@ class Area:
                 DC = K_ext * W_ext * tau_syn * 1.e-3 * \
                     self.network.params['rate_ext']
                 I_e += DC
-            nest.SetStatus(gid, {'I_e': I_e})
+            gid.set({'I_e': I_e})
 
-            # Store first and last GID of each population
-            self.gids[pop] = (gid[0], gid[-1])
+            # Store GIDCollection of each population
+            self.gids[pop] = gid
 
             # Initialize membrane potentials
             # This could also be done after creating all areas, which
             # might yield better performance. Has to be tested.
-            for t in np.arange(nest.GetKernelStatus('local_num_threads')):
-                local_nodes = np.array(nest.GetNodes(
-                    [0], {
-                        'model': self.network.params['neuron_params']['neuron_model'],
-                        'thread': t
-                    }, local_only=True
-                )[0])
-                local_nodes_pop = local_nodes[(np.logical_and(local_nodes >= gid[0],
-                                                              local_nodes <= gid[-1]))]
-                if len(local_nodes_pop) > 0:
-                    vp = nest.GetStatus([local_nodes_pop[0]], 'vp')[0]
-                    # vp is the same for all local nodes on the same thread
-                    nest.SetStatus(
-                        list(local_nodes_pop), 'V_m', self.simulation.pyrngs[vp].normal(
-                            self.network.params['neuron_params']['V0_mean'],
-                            self.network.params['neuron_params']['V0_sd'],
-                            len(local_nodes_pop))
-                            )
-                    self.num_local_nodes += len(local_nodes_pop)
+            gid.set({'V_m':
+                     nest.random.normal(self.network.params['neuron_params']['V0_mean'],
+                                       self.network.params['neuron_params']['V0_sd'])})
 
     def connect_populations(self):
         """
@@ -482,7 +466,7 @@ class Area:
             for pop in self.populations:
                 # Always record spikes from all neurons to get correct
                 # statistics
-                nest.Connect(tuple(range(self.gids[pop][0], self.gids[pop][1] + 1)),
+                nest.Connect(self.gids[pop],
                              self.simulation.spike_detector)
 
         if self.simulation.params['recording_dict']['record_vm']:
@@ -490,19 +474,17 @@ class Area:
                 nrec = int(self.simulation.params['recording_dict']['Nrec_vm_fraction'] *
                            self.neuron_numbers[pop])
                 nest.Connect(self.simulation.voltmeter,
-                             tuple(range(self.gids[pop][0], self.gids[pop][0] + nrec + 1)))
+                             self.gids[pop][:nrec])
         if self.network.params['input_params']['poisson_input']:
             self.poisson_generators = []
             for pop in self.populations:
                 K_ext = self.external_synapses[pop]
                 W_ext = self.network.W[self.name][pop]['external']['external']
-                pg = nest.Create('poisson_generator', 1)
-                nest.SetStatus(
-                    pg, {'rate': self.network.params['input_params']['rate_ext'] * K_ext})
+                pg = nest.Create('poisson_generator')
+                pg.set({'rate': self.network.params['input_params']['rate_ext'] * K_ext})
                 syn_spec = {'weight': W_ext}
                 nest.Connect(pg,
-                             tuple(
-                                 range(self.gids[pop][0], self.gids[pop][1] + 1)),
+                             self.gids[pop],
                              syn_spec=syn_spec)
                 self.poisson_generators.append(pg[0])
 
@@ -543,24 +525,20 @@ class Area:
                 K = synapses[pop][source_pop] / self.neuron_numbers[pop]
 
                 if input_type == 'het_current_nonstat':
-                    curr_gen = nest.Create('step_current_generator', 1)
+                    curr_gen = nest.Create('step_current_generator')
                     dt = self.simulation.params['dt']
                     T = self.simulation.params['t_sim']
                     assert(len(cc_input[source_pop]) == int(T))
-                    nest.SetStatus(curr_gen, {'amplitude_values': K * cc_input[source_pop] * 1e-3,
-                                              'amplitude_times': np.arange(dt,
-                                                                           T + dt,
-                                                                           1.)})
+                    curr_gen.set({'amplitude_values': K * cc_input[source_pop] * 1e-3,
+                                  'amplitude_times': np.arange(dt, T + dt, 1.)})
                     nest.Connect(curr_gen,
-                                 tuple(
-                                     range(self.gids[pop][0], self.gids[pop][1] + 1)),
+                                 self.gids[pop],
                                  syn_spec=syn_spec)
                 elif 'poisson_stat' in input_type:  # hom. and het. poisson lead here
-                    pg = nest.Create('poisson_generator', 1)
-                    nest.SetStatus(pg, {'rate': K * cc_input[source_pop]})
+                    pg = nest.Create('poisson_generator')
+                    pg.set({'rate': K * cc_input[source_pop]})
                     nest.Connect(pg,
-                                 tuple(
-                                     range(self.gids[pop][0], self.gids[pop][1] + 1)),
+                                 self.gids,
                                  syn_spec=syn_spec)
 
 
@@ -620,9 +598,7 @@ def connect(simulation,
                         'delay': syn_delay,
                         'model': 'static_synapse'}
 
-            nest.Connect(tuple(range(source_area.gids[source][0],
-                                     source_area.gids[source][1] + 1)),
-                         tuple(range(target_area.gids[target][0],
-                                     target_area.gids[target][1] + 1)),
+            nest.Connect(source_area.gids[source],
+                         target_area.gids[target],
                          conn_spec,
                          syn_spec)
