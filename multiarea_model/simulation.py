@@ -441,7 +441,7 @@ class Area:
                 DC = K_ext * W_ext * tau_syn * 1.e-3 * \
                     self.network.params['rate_ext']
                 I_e += DC
-            gid.set({'I_e': I_e})
+            gid.I_e = I_e
 
             # Store GIDCollection of each population
             self.gids[pop] = gid
@@ -449,9 +449,8 @@ class Area:
             # Initialize membrane potentials
             # This could also be done after creating all areas, which
             # might yield better performance. Has to be tested.
-            gid.set({'V_m':
-                     nest.random.normal(self.network.params['neuron_params']['V0_mean'],
-                                       self.network.params['neuron_params']['V0_sd'])})
+            gid.V_m = nest.random.normal(self.network.params['neuron_params']['V0_mean'],
+                                         self.network.params['neuron_params']['V0_sd'])
 
     def connect_populations(self):
         """
@@ -481,7 +480,7 @@ class Area:
                 K_ext = self.external_synapses[pop]
                 W_ext = self.network.W[self.name][pop]['external']['external']
                 pg = nest.Create('poisson_generator')
-                pg.set({'rate': self.network.params['input_params']['rate_ext'] * K_ext})
+                pg.rate = self.network.params['input_params']['rate_ext'] * K_ext
                 syn_spec = {'weight': W_ext}
                 nest.Connect(pg,
                              self.gids[pop],
@@ -529,14 +528,14 @@ class Area:
                     dt = self.simulation.params['dt']
                     T = self.simulation.params['t_sim']
                     assert(len(cc_input[source_pop]) == int(T))
-                    curr_gen.set({'amplitude_values': K * cc_input[source_pop] * 1e-3,
-                                  'amplitude_times': np.arange(dt, T + dt, 1.)})
+                    curr_gen.set(amplitude_values=K * cc_input[source_pop] * 1e-3,
+                                 amplitude_times=np.arange(dt, T + dt, 1.))
                     nest.Connect(curr_gen,
                                  self.gids[pop],
                                  syn_spec=syn_spec)
                 elif 'poisson_stat' in input_type:  # hom. and het. poisson lead here
                     pg = nest.Create('poisson_generator')
-                    pg.set({'rate': K * cc_input[source_pop]})
+                    pg.rate = K * cc_input[source_pop]
                     nest.Connect(pg,
                                  self.gids,
                                  syn_spec=syn_spec)

@@ -165,14 +165,14 @@ class Theory:
             initial_rates = next(gen)
             print("Iteration: {}".format(iteration))
             for i in range(dim):
-                neurons[i].set({'rate': initial_rates[i]})
+                neurons[i].rate = initial_rates[i]
             # simulate
             nest.Simulate(T + dt)
-            data = multimeter.get('events')
+            data = multimeter.events
             # Extract the data of this iteration
             ind = np.where(np.logical_and(data['times'] > total_time,
                                           data['times'] <= total_time + T))
-            res = np.array([np.insert(data['rate'][ind][np.where(data['senders'][ind] == n.get('global_id'))],
+            res = np.array([np.insert(data['rate'][ind][np.where(data['senders'][ind] == n.global_id)],
                                       0,
                                       initial_rates[i])
                             for i, n in enumerate(neurons)])
