@@ -49,7 +49,7 @@ def test_nest_network_connectivity():
     """
     print("Testing external input")
     for area in M.simulation.areas:
-        poisson_rates = nest.GetStatus(area.poisson_generators, 'rate')
+        poisson_rates = area.poisson_generators.rate
 
         K_ext = []
         for pop in M.structure[area.name]:
