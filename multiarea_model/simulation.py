@@ -91,8 +91,8 @@ class Simulation:
 
         self.areas_simulated = self.params['areas_simulated']
         self.areas_recorded = self.params['recording_dict']['areas_recorded']
-        self.pre_T = self.params['t_sim']
-        self.T = self.params['t_presim']
+        self.t_presim = self.params['t_presim']
+        self.T = self.params['t_sim']
 
     def __eq__(self, other):
         # Two simulations are equal if the simulation parameters and
