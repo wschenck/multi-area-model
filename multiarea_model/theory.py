@@ -88,7 +88,7 @@ class Theory:
         # external drive
         syn_dict = {'drift_factor': tau * np.array([K[:, -1] * J[:, -1]]).transpose(),
                     'diffusion_factor': tau * np.array([K[:, -1] * J[:, -1]**2]).transpose(),
-                    'model': 'diffusion_connection',
+                    'synapse_model': 'diffusion_connection',
                     'receptor_type': 0}
         nest.Connect(drive, neurons, 'all_to_all', syn_dict)
 
@@ -100,7 +100,7 @@ class Theory:
         syn_dict = {'drift_factor': 1e3 * tau / C_m * np.array(
             self.network.add_DC_drive).reshape(dim, 1),
                     'diffusion_factor': 0.,
-                    'model': 'diffusion_connection',
+                    'synapse_model': 'diffusion_connection',
                     'receptor_type': 0}
         nest.Connect(DC_drive, neurons, 'all_to_all', syn_dict)
         # handle switches for cortico-cortical connectivity
@@ -114,7 +114,7 @@ class Theory:
             add_drive = nest.Create('siegert_neuron', 1, params={'rate': 1., 'mean': 1.})
             syn_dict = {'drift_factor': np.array([mu_CC]).transpose(),
                         'diffusion_factor': np.array([sigma2_CC]).transpose(),
-                        'model': 'diffusion_connection',
+                        'synapse_model': 'diffusion_connection',
                         'receptor_type': 0}
             nest.Connect(add_drive, neurons, 'all_to_all', syn_dict)
         elif self.network.params['connection_params']['replace_cc'] == 'het_current_nonstat':
@@ -124,7 +124,7 @@ class Theory:
         # network connections
         syn_dict = {'drift_factor': tau * K[:, :-1] * J[:, :-1],
                     'diffusion_factor': tau * K[:, :-1] * J[:, :-1]**2,
-                    'model': 'diffusion_connection',
+                    'synapse_model': 'diffusion_connection',
                     'receptor_type': 0}
         nest.Connect(neurons, neurons, 'all_to_all', syn_dict)
 
@@ -135,9 +135,7 @@ class Theory:
             
         multimeter = nest.Create('multimeter', params={'record_from': ['rate'],
                                                        'interval': interval,
-                                                       'to_screen': False,
-                                                       'to_file': False,
-                                                       'to_memory': True})
+                                                       'record_to': 'memory'})
         # multimeter
         nest.Connect(multimeter, neurons)
 
@@ -167,14 +165,14 @@ class Theory:
             initial_rates = next(gen)
             print("Iteration: {}".format(iteration))
             for i in range(dim):
-                nest.SetStatus([neurons[i]], {'rate': initial_rates[i]})
+                neurons[i].rate = initial_rates[i]
             # simulate
             nest.Simulate(T + dt)
-            data = nest.GetStatus(multimeter)[0]['events']
+            data = multimeter.events
             # Extract the data of this iteration
             ind = np.where(np.logical_and(data['times'] > total_time,
                                           data['times'] <= total_time + T))
-            res = np.array([np.insert(data['rate'][ind][np.where(data['senders'][ind] == n)],
+            res = np.array([np.insert(data['rate'][ind][np.where(data['senders'][ind] == n.global_id)],
                                       0,
                                       initial_rates[i])
                             for i, n in enumerate(neurons)])
