@@ -75,6 +75,10 @@ source /path/to/installation/bin/nest_vars.sh
 python run_scaling.py
 ```
 
+## Rough analysis
+The folder analysis\_scripts contains a file called count\_spikes.sh. This file can be used to extract the rate from the simulated data. Only one variable, data\_dir, needs to be changed such that it points in the direction of the files. The rate should roughly be somewhere between 10 and 16 Hz. More information is located inside of the script. As it takes long, I would suggest to run it inside a tmux session such that one can disconnect from the ssh session. Run with `bash count_spikes.sh`
+
+Furthermore there is a script that can tar all directories once the benchmark is finished. It is called `tar_all.sh`. The tared files can then be moved to a storage server.
 
 # Multi-scale spiking network model of macaque visual cortex
 [![www.python.org](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org) <a href="http://www.nest-simulator.org"> <img src="https://raw.githubusercontent.com/nest/nest-simulator/master/extras/logos/nest-simulated.png" alt="NEST simulated" width="50"/></a> [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)

@@ -1,3 +1,9 @@
+# This script can tar all simulation directories such that one can eventually move them to a safe storage server
+# Change data_dir to the directory where the simulation data is stored
+
+data_dir=XXX
+cd ${data_dir}
+
 dirs=$(find .  -maxdepth 1 -mindepth 1 -type d)
 for dir in ${dirs}
 do
