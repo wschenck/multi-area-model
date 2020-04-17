@@ -16,11 +16,11 @@ import nest
 import os
 import sys
 
-from config import data_path
 from multiarea_model import MultiAreaModel
 
 label = sys.argv[1]
 network_label = sys.argv[2]
+data_path = sys.argv[3]
 fn = os.path.join(data_path,
                   label,
                   '_'.join(('custom_params',

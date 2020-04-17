@@ -21,12 +21,16 @@ t_presim = 10.
 t_sim = 10000.
 NEST_DIR = ['/p/project/cjinb33/jinb3330/gitordner/nest-simulator/f10cd16/bin/nest_vars.sh']
 
-for nest_dir in NEST_DIR:
+# Place to store simulations
+DATA_PATH =  ['/home/pronold/git_ordner/multi-area-model/datalol']
+
+for i, nest_dir in enumerate(NEST_DIR):
     for mpi_proc_per_node in [6]:
         for num_nodes in range(16,25,8):
             for master_seed in [0, 17, 666]:
                 local_num_threads = int(total_num_vp_per_node / mpi_proc_per_node)
                 num_processes = (num_nodes * mpi_proc_per_node)
+                data_path = DATA_PATH[i]
 
                 sim_params.update(
                         {
@@ -36,9 +40,13 @@ for nest_dir in NEST_DIR:
                             'num_nodes': num_nodes,
                             'local_num_threads': local_num_threads,
                             'master_seed': master_seed,
-                            'nest_dir': nest_dir
+                            'nest_dir': nest_dir,
+                            'data_path': data_path
                             }
                         )
+
+                if not os.path.exists(data_path):
+                    os.makedirs(data_path)
 
                 M = MultiAreaModel(network_params, simulation=True,
                                    sim_spec=sim_params,
@@ -50,4 +58,4 @@ for nest_dir in NEST_DIR:
                 print("Mean-field theory predicts an average "
                       "rate of {0:.3f} spikes/s across all populations.".format(np.mean(r[:, -1])))
 
-                start_job(M.simulation.label, submit_cmd, jobscript_template)
+                start_job(M.simulation.label, submit_cmd, jobscript_template, data_path)

@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 
-from config import base_path, data_path
+from config import base_path
 from multiarea_model.default_params import nested_update, sim_params
 try:
     from multiarea_model.sumatra_helpers import register_record
@@ -11,7 +11,7 @@ except ImportError:
     sumatra_found = False
 
 
-def start_job(label, submit_cmd, jobscript_template, sumatra=False, reason=None, tag=None):
+def start_job(label, submit_cmd, jobscript_template, data_path, sumatra=False, reason=None, tag=None):
     """
     Start job on a compute cluster.
 
@@ -66,6 +66,7 @@ def start_job(label, submit_cmd, jobscript_template, sumatra=False, reason=None,
          'num_processes': sim_params['num_processes'],
          'num_vp': num_vp,
          'nest_dir': sim_params['nest_dir'],
+         'data_path': sim_params['data_path'],
          'num_nodes': sim_params['num_nodes'],
          'num_physical_cores_per_task': sim_params['num_physical_cores_per_task']}
 

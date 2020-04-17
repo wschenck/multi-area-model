@@ -55,7 +55,9 @@ sim_params = {
     # Default number of threads per core
     'num_physical_cores_per_task': 1,
     # Default directory of NEST
-    'nest_dir': ''
+    'nest_dir': '',
+    # Place to store simulations
+    'data_path':  ''
 }
 
 """

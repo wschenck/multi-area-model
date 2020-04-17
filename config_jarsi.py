@@ -1,9 +1,6 @@
 # Absolut path of repository
 base_path = '/p/project/cjinb33/jinb3330/gitordner/mam_benchmarking/2_14/multi-area-model'
 
-# Place to store simulations
-data_path = '/p/scratch/cjinb33/jinb3330/mam_benches/2_14/fig5_params_kernel_status'
-
 # Template for jobscripts
 jobscript_template = """#!/bin/bash -x
 #SBATCH --job-name MAM_4g
@@ -26,7 +23,7 @@ source {nest_dir}
 export KMP_AFFINITY=scatter,verbose
 export LD_PRELOAD=/p/project/cjinb33/jinb3330/jemalloc/lib/libjemalloc.so
 
-srun python -u {base_path}/run_simulation.py {label} {network_label}"""
+srun python -u {base_path}/run_simulation.py {label} {network_label} {data_path}"""
 
 # Command to submit jobs on the local cluster
 submit_cmd = 'sbatch' 

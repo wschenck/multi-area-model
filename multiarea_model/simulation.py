@@ -24,7 +24,7 @@ import shutil
 import time
 
 from .analysis_helpers import _load_npy_to_dict, model_iter
-from config import base_path, data_path
+from config import base_path
 from copy import deepcopy
 from .default_params import nested_update, sim_params
 from .default_params import check_custom_params
@@ -55,6 +55,7 @@ class Simulation:
             default parameters defined in default_params.py
         """
         self.params = deepcopy(sim_params)
+        data_path = sim_spec['data_path']
         if isinstance(sim_spec, dict):
             check_custom_params(sim_spec, self.params)
             self.custom_params = sim_spec
