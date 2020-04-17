@@ -19,34 +19,35 @@ theory_params = {'dt': 0.1}
 total_num_vp_per_node = 24
 t_presim = 10.
 t_sim = 10000.
-nest_dir = '/p/project/cjinb33/jinb3330/gitordner/nest-simulator/f10cd16/bin/nest_vars.sh'
+NEST_DIR = ['/p/project/cjinb33/jinb3330/gitordner/nest-simulator/f10cd16/bin/nest_vars.sh']
 
-for mpi_proc_per_node in [6]:
-    for num_nodes in range(16,25,8):
-        for master_seed in [0, 17, 666]:
-            local_num_threads = int(total_num_vp_per_node / mpi_proc_per_node)
-            num_processes = (num_nodes * mpi_proc_per_node)
+for nest_dir in NEST_DIR:
+    for mpi_proc_per_node in [6]:
+        for num_nodes in range(16,25,8):
+            for master_seed in [0, 17, 666]:
+                local_num_threads = int(total_num_vp_per_node / mpi_proc_per_node)
+                num_processes = (num_nodes * mpi_proc_per_node)
 
-            sim_params.update(
-                    {
-                        't_presim': t_presim,
-                        't_sim': t_sim,
-                        'num_processes': num_processes,
-                        'num_nodes': num_nodes,
-                        'local_num_threads': local_num_threads,
-                        'master_seed': master_seed,
-                        'nest_dir': nest_dir
-                        }
-                    )
+                sim_params.update(
+                        {
+                            't_presim': t_presim,
+                            't_sim': t_sim,
+                            'num_processes': num_processes,
+                            'num_nodes': num_nodes,
+                            'local_num_threads': local_num_threads,
+                            'master_seed': master_seed,
+                            'nest_dir': nest_dir
+                            }
+                        )
 
-            M = MultiAreaModel(network_params, simulation=True,
-                               sim_spec=sim_params,
-                               theory=True,
-                               theory_spec=theory_params)
+                M = MultiAreaModel(network_params, simulation=True,
+                                   sim_spec=sim_params,
+                                   theory=True,
+                                   theory_spec=theory_params)
 
-            p, r = M.theory.integrate_siegert()
+                p, r = M.theory.integrate_siegert()
 
-            print("Mean-field theory predicts an average "
-                  "rate of {0:.3f} spikes/s across all populations.".format(np.mean(r[:, -1])))
+                print("Mean-field theory predicts an average "
+                      "rate of {0:.3f} spikes/s across all populations.".format(np.mean(r[:, -1])))
 
-            start_job(M.simulation.label, submit_cmd, jobscript_template)
+                start_job(M.simulation.label, submit_cmd, jobscript_template)
