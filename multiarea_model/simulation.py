@@ -349,8 +349,8 @@ class Simulation:
                 for pop in self.network.structure[area.name]:
                     f.write("{area},{pop},{g0},{g1}\n".format(area=area.name,
                                                               pop=pop,
-                                                              g0=area.gids[pop][0],
-                                                              g1=area.gids[pop][1]))
+                                                              g0=area.gids[pop][0].get()['global_id'],
+                                                              g1=area.gids[pop][-1].get()['global_id']))
 
     def register_runtime(self):
         if sumatra_found:
