@@ -132,13 +132,14 @@ class Analysis:
                                                      self.simulation.params[
                                                          'recording_dict'][d]['label'],
                                                      '*')),
-                                           'gdf'))
+                                           'dat'))
                             files = glob.glob(os.path.join(rec_dir, fp))
                             dat = pd.DataFrame(columns=columns)
                             for f in files:
                                 dat = dat.append(pd.read_csv(f,
                                                              names=columns, sep='\t',
-                                                             index_col=False),
+                                                             index_col=False,
+                                                             skiprows=3),
                                                  ignore_index=True)
                             self.all_spikes = dat
                         print(area, pop)
