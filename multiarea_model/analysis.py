@@ -128,17 +128,22 @@ class Analysis:
                         data[area][pop] = np.load(fn, allow_pickle=True)
                     except FileNotFoundError:
                         if not hasattr(self, 'all_spikes'):
+                            file_ending = 'gdf'
+                            csv_args = {'names': columns,
+                                      'sep': '\t',
+                                      'index_col': False}
+                            if glob.glob('*.dat'):
+                                file_ending = 'dat'
+                                csv_args.update({'skiprows': 3})
                             fp = '.'.join(('-'.join((self.simulation.label,
                                                      self.simulation.params[
                                                          'recording_dict'][d]['label'],
                                                      '*')),
-                                           'gdf'))
+                                           file_ending))
                             files = glob.glob(os.path.join(rec_dir, fp))
                             dat = pd.DataFrame(columns=columns)
                             for f in files:
-                                dat = dat.append(pd.read_csv(f,
-                                                             names=columns, sep='\t',
-                                                             index_col=False),
+                                dat = dat.append(pd.read_csv(f, **csv_args),
                                                  ignore_index=True)
                             self.all_spikes = dat
                         print(area, pop)
