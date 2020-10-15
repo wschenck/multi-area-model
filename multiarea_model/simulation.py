@@ -145,6 +145,10 @@ class Simulation:
         Prepare NEST Kernel.
         """
         nest.ResetKernel()
+        # BEGIN: --- DRY-RUN ---
+        nest.EnableDryrun()
+        nest.SetKernelStatus({'num_processes': self.params['num_processes']})
+        # END:   --- DRY-RUN ---
         master_seed = self.params['master_seed']
         num_processes = self.params['num_processes']
         local_num_threads = self.params['local_num_threads']
