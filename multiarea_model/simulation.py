@@ -302,9 +302,36 @@ class Simulation:
 
         nest.Simulate(self.T)
         t4 = time.time()
-        self.time_simulate = t4 - t3
+        self.time_simulate_script = t4 - t3
         self.total_memory = self.memory()
-        print("Simulated network in {0:.2f} seconds.".format(self.time_simulate))
+        print("Simulated network in {0:.2f} seconds.".format(self.time_simulate_script))
+
+        nest_kernel_status = nest.GetKernelStatus()
+        self.time_construction_create = nest_kernel_status['time_construction_create']
+        self.time_construction_connect = nest_kernel_status['time_construction_connect']
+        self.time_communicate_prepare = nest_kernel_status['time_communicate_prepare']
+        self.time_simulate = nest_kernel_status['time_simulate']
+        try:
+            self.time_gather_target_data = nest_kernel_status['time_gather_target_data']
+            self.time_communicate_target_data = nest_kernel_status['time_communicate_target_data']
+            self.time_update = nest_kernel_status['time_update']
+            self.time_gather_spike_data = nest_kernel_status['time_gather_spike_data']
+            self.time_collocate_spike_data = nest_kernel_status['time_collocate_spike_data']
+            self.time_communicate_spike_data = nest_kernel_status['time_communicate_spike_data']
+            self.time_deliver_spike_data = nest_kernel_status['time_deliver_spike_data']
+        except:
+            self.time_gather_target_data = 0.0
+            self.time_communicate_target_data = 0.0
+            self.time_update = 0.0
+            self.time_gather_spike_data = 0.0
+            self.time_collocate_spike_data = 0.0
+            self.time_communicate_spike_data = 0.0
+            self.time_deliver_spike_data = 0.0
+        try:
+            self.time_dryrun_init_aux = nest_kernel_status['time_dryrun_init_aux']
+        except:
+            self.time_dryrun_init_aux = 0.0
+
         self.logging()
 
     def memory(self):
@@ -329,10 +356,22 @@ class Simulation:
             d = {'time_prepare': self.time_prepare,
                  'time_network_local': self.time_network_local,
                  'time_network_global': self.time_network_global,
-                 'time_simulate': self.time_simulate,
+                 'time_simulate_script': self.time_simulate_script,
                  'base_memory': self.base_memory,
                  'network_memory': self.network_memory,
-                 'total_memory': self.total_memory}
+                 'total_memory': self.total_memory,
+                 'time_construction_create': self.time_construction_create,
+                 'time_construction_connect': self.time_construction_connect,
+                 'time_communicate_prepare': self.time_communicate_prepare,
+                 'time_simulate': self.time_simulate,
+                 'time_gather_target_data': self.time_gather_target_data,
+                 'time_communicate_target_data': self.time_communicate_target_data,
+                 'time_update': self.time_update,
+                 'time_gather_spike_data': self.time_gather_spike_data,
+                 'time_collocate_spike_data': self.time_collocate_spike_data,
+                 'time_communicate_spike_data': self.time_communicate_spike_data,
+                 'time_deliver_spike_data': self.time_deliver_spike_data,
+                 'time_dryrun_init_aux': self.time_dryrun_init_aux }
             fn = os.path.join(self.data_dir,
                               'recordings',
                               '_'.join((self.label,
