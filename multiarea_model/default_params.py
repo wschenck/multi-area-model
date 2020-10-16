@@ -47,6 +47,8 @@ sim_params = {
     'num_processes': 1,
     # no. of threads per MPI process':
     'local_num_threads': 1,
+    # enabling of dry-run mode
+    'enable_dryrun': False,
     # Areas represented in the network
     'areas_simulated': complete_area_list,
 }

@@ -38,6 +38,7 @@ network_params = {'N_scaling': 1.,
 sim_params = {'t_sim': 2000.,
               'num_processes': 720,
               'local_num_threads': 1,
+              'enable_dryrun': False,
               'recording_dict': {'record_vm': False}}
 
 theory_params = {'dt': 0.1}
