@@ -73,6 +73,7 @@ class Theory:
         tau = self.NP['tau_m'] * 1e-3
         dim = np.shape(K)[0]
         nest.ResetKernel()
+        #TODO (maybe): Activate dry-run mode also here...
         nest.set_verbosity('M_FATAL')
         nest.SetKernelStatus({'resolution': dt,
                               'use_wfr': False,
